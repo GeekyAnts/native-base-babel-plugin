@@ -74,7 +74,9 @@ function updateComponentMap(component, propArray) {
   if (!componentsMap[component]) {
     componentsMap[component] = [];
   }
-  componentsMap[component]?.push(propArray);
+  if (componentsMap[component]) {
+    componentsMap[component].push(propArray);
+  }
 }
 let componentsList = {};
 let componentsMap = {};
@@ -112,13 +114,15 @@ module.exports = function ({ types: t }) {
           path.traverse({
             ImportDeclaration(importPath) {
               if (importPath.node.source.value === "native-base") {
-                importPath.node.specifiers?.map((specifier) => {
-                  if (specifier.imported) {
-                    componentsList[specifier.imported.name] = true;
-                  } else {
-                    componentsList["allImport"] = true;
-                  }
-                });
+                if (importPath.node.specifiers) {
+                  importPath.node.specifiers.map((specifier) => {
+                    if (specifier.imported) {
+                      componentsList[specifier.imported.name] = true;
+                    } else {
+                      componentsList["allImport"] = true;
+                    }
+                  });
+                }
               }
             },
           });

@@ -20,5 +20,8 @@
   },
   "devDependencies": {
     "native-base": "3.5.0-alpha.4"
+  },
+  "engines": {
+    "node": ">=10.24.1"
   }
 }
