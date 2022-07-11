@@ -1,0 +1,24 @@
+{
+  "name": "native-base-babel-plugin",
+  "version": "1.0.0",
+  "description": "A babel plugin to add Build time theme resolution for Nativebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cd example && rm -rf .expo && yarn start",
+    "dev:web": "cd example && rm -rf .expo && yarn web",
+    "dev:android": "cd example && rm -rf .expo && yarn android",
+    "dev:ios": "cd example && rm -rf .expo && yarn ios"
+  },
+  "author": "Rohit Singh",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.18.6"
+  },
+  "peerDependencies": {
+    "native-base": "3.5.0-alpha.4"
+  },
+  "devDependencies": {
+    "native-base": "3.5.0-alpha.4"
+  }
+}
