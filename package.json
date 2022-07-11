@@ -1,5 +1,5 @@
 {
-  "name": "native-base-babel-plugin",
+  "name": "@native-base/babel-plugin",
   "version": "1.0.0",
   "description": "A babel plugin to add Build time theme resolution for Nativebase",
   "main": "index.js",
