@@ -1,0 +1,5 @@
+example/
+node_modules/
+.expo/
+.DS_Store
+web-build/

@@ -1,6 +1,6 @@
 const t = require("@babel/types");
 const p = require("@babel/parser");
-const bundle = require("./node_modules/native-base/src/bundle");
+const bundle = require(process.cwd() + "/node_modules/native-base/src/bundle");
 
 // Utility functions
 const findVariableDeclarationFromIdentifierName = (path, name) => {
