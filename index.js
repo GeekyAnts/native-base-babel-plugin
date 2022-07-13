@@ -3,31 +3,9 @@ const p = require("@babel/parser");
 const bundle = require(process.cwd() + "/node_modules/native-base/src/bundle");
 
 // Utility functions
-const findVariableDeclarationFromIdentifierName = (path, name) => {
-  const variableDeclaration = path.findParent((p) => {
-    if (p.node.type === "VariableDeclaration") {
-      p.traverse({
-        Identifier(path) {
-          if (path.node.name === name) {
-            return true;
-          }
-        },
-      });
-    }
-    return false;
-  });
-  if (variableDeclaration) {
-    const variableDeclarator = variableDeclaration
-      .get("declarations")
-      .find((declarator) => {
-        return declarator.get("id").node.name === name;
-      });
-    if (variableDeclarator) {
-      return variableDeclarator;
-    }
-  }
-  return null;
-};
+function createJSXAttributeNode(name, value) {
+  return t.jsxAttribute(t.jsxIdentifier(name), t.stringLiteral(value));
+}
 function astify(literal) {
   if (literal === null) {
     return t.nullLiteral();
@@ -78,6 +56,21 @@ function updateComponentMap(component, propArray) {
     componentsMap[component].push(propArray);
   }
 }
+
+function uniqueId(prefix = "$lodash$") {
+  if (!idCounter[prefix]) {
+    idCounter[prefix] = 0;
+  }
+
+  const id = ++idCounter[prefix];
+  if (prefix === "$lodash$") {
+    return `${id}`;
+  }
+
+  return `${prefix}${id}`;
+}
+
+const idCounter = {};
 let componentsList = {};
 let componentsMap = {};
 
@@ -133,20 +126,42 @@ module.exports = function ({ types: t }) {
                   jsxOpeningElementPath.node.name.name
                 )
               ) {
-                const attrs = jsxOpeningElementPath.node.attributes;
-                const componentAttrs = {};
-                attrs.map((attr) => {
-                  if (
-                    ["colorScheme", "variant", "size"].includes(attr.name.name)
-                  ) {
-                    componentAttrs[attr.name.name] = attr.value.value;
+                if (
+                  jsxOpeningElementPath.node.name.name === "NativeBaseProvider"
+                ) {
+                  if (jsxOpeningElementPath.node.attributes) {
+                    jsxOpeningElementPath.node.attributes.push(
+                      createJSXAttributeNode(
+                        "providerId",
+                        uniqueId("nbBootTime-")
+                      )
+                    );
+                  } else {
+                    jsxOpeningElementPath.node.attributes = [
+                      createJSXAttributeNode(
+                        "providerId",
+                        uniqueId("nbBootTime-")
+                      ),
+                    ];
                   }
-                });
-                if (!isEmptyObj(componentAttrs)) {
-                  updateComponentMap(
-                    jsxOpeningElementPath.node.name.name,
-                    componentAttrs
-                  );
+                } else {
+                  const attrs = jsxOpeningElementPath.node.attributes;
+                  const componentAttrs = {};
+                  attrs.map((attr) => {
+                    if (
+                      ["colorScheme", "variant", "size"].includes(
+                        attr.name.name
+                      )
+                    ) {
+                      componentAttrs[attr.name.name] = attr.value.value;
+                    }
+                  });
+                  if (!isEmptyObj(componentAttrs)) {
+                    updateComponentMap(
+                      jsxOpeningElementPath.node.name.name,
+                      componentAttrs
+                    );
+                  }
                 }
               }
             },
