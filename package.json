@@ -1,6 +1,6 @@
 {
   "name": "@native-base/babel-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A babel plugin to add Build time theme resolution for Nativebase",
   "main": "index.js",
   "scripts": {
@@ -16,10 +16,10 @@
     "@babel/core": "^7.18.6"
   },
   "peerDependencies": {
-    "native-base": "3.5.0-alpha.4"
+    "native-base": "*"
   },
   "devDependencies": {
-    "native-base": "3.5.0-alpha.4"
+    "native-base": "3.5.0-alpha.5"
   },
   "engines": {
     "node": ">=10.24.1"
