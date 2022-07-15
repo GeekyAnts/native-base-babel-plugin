@@ -1388,10 +1388,10 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-native-base@3.5.0-alpha.4:
-  version "3.5.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.5.0-alpha.4.tgz#566c40ea57c8db88be2527bb0d5b418c59351d45"
-  integrity sha512-4M6K1Ixnk6UhL4zr+er7kqemJmohzbuH7e3bQVWbzCm4HtMVGxRgfaGYwI61jg/xv0GmXBfbEf10jAfgwCVDag==
+native-base@3.5.0-alpha.5:
+  version "3.5.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.5.0-alpha.5.tgz#220afe89e160266daac6687248f3e75341f70cca"
+  integrity sha512-BxiBlLaPBX17+SDDDvP0OfFPNZUBmWAE2CbOEqlHJ+W7Km+yDJmVLp8y+YpbsMwoMwIC6tiyec528X8kF8TDsA==
   dependencies:
     "@react-aria/focus" "^3.2.3"
     "@react-aria/utils" "^3.6.0"

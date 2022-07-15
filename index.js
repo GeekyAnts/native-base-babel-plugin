@@ -92,7 +92,7 @@ module.exports = function ({ types: t }) {
                       t.identifier("init")
                     ),
                   ],
-                  t.stringLiteral("./core/ResolvedStyleMap")
+                  t.stringLiteral("./utils/styled")
                 ),
                 t.expressionStatement(
                   t.callExpression(t.identifier("init"), [

@@ -5831,10 +5831,10 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-native-base@3.5.0-alpha.4:
-  version "3.5.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.5.0-alpha.4.tgz#566c40ea57c8db88be2527bb0d5b418c59351d45"
-  integrity sha512-4M6K1Ixnk6UhL4zr+er7kqemJmohzbuH7e3bQVWbzCm4HtMVGxRgfaGYwI61jg/xv0GmXBfbEf10jAfgwCVDag==
+native-base@3.5.0-alpha.5:
+  version "3.5.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.5.0-alpha.5.tgz#220afe89e160266daac6687248f3e75341f70cca"
+  integrity sha512-BxiBlLaPBX17+SDDDvP0OfFPNZUBmWAE2CbOEqlHJ+W7Km+yDJmVLp8y+YpbsMwoMwIC6tiyec528X8kF8TDsA==
   dependencies:
     "@react-aria/focus" "^3.2.3"
     "@react-aria/utils" "^3.6.0"
