@@ -2,7 +2,6 @@ const t = require("@babel/types");
 const p = require("@babel/parser");
 const bundle = require(process.cwd() + "/node_modules/native-base/src/bundle");
 const fs = require("fs");
-const { log } = require("console");
 
 // Utility functions
 let providerIds = [];
@@ -187,7 +186,6 @@ module.exports = function ({ types: t }) {
           },
         });
         if (!filePath.includes("/node_modules/")) {
-          console.log(componentsMap, "Componnet Map");
           updateFile("web", componentsMap);
           updateFile("ios", componentsMap);
           updateFile("android", componentsMap);
