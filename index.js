@@ -1,50 +1,54 @@
 const t = require("@babel/types");
 const p = require("@babel/parser");
 const bundle = require(process.cwd() + "/node_modules/native-base/src/bundle");
+const fs = require("fs");
+const { log } = require("console");
 
 // Utility functions
+let providerIds = [];
 function createJSXAttributeNode(name, value) {
+  providerIds.push(value);
   return t.jsxAttribute(t.jsxIdentifier(name), t.stringLiteral(value));
 }
-function astify(literal) {
-  if (literal === null) {
-    return t.nullLiteral();
-  }
-  switch (typeof literal) {
-    case "function":
-      const ast = babylon.parse(literal.toString(), {
-        allowReturnOutsideFunction: true,
-        allowSuperOutsideMethod: true,
-      });
-      return traverse.removeProperties(ast);
-    case "number":
-      return t.numericLiteral(literal);
-    case "string":
-      return t.stringLiteral(literal);
-    case "boolean":
-      return t.booleanLiteral(literal);
-    case "undefined":
-      return t.unaryExpression("void", t.numericLiteral(0), true);
-    default:
-      if (Array.isArray(literal)) {
-        return t.arrayExpression(literal.map(astify));
-      }
-      return t.objectExpression(
-        Object.keys(literal)
-          .filter((k) => {
-            return typeof literal[k] !== "undefined";
-          })
-          .map((k) => {
-            return t.objectProperty(t.stringLiteral(k), astify(literal[k]));
-          })
-      );
-  }
-}
-function pbcopy(data) {
-  var proc = require("child_process").spawn("pbcopy");
-  proc.stdin.write(data);
-  proc.stdin.end();
-}
+// function astify(literal) {
+//   if (literal === null) {
+//     return t.nullLiteral();
+//   }
+//   switch (typeof literal) {
+//     case "function":
+//       const ast = babylon.parse(literal.toString(), {
+//         allowReturnOutsideFunction: true,
+//         allowSuperOutsideMethod: true,
+//       });
+//       return traverse.removeProperties(ast);
+//     case "number":
+//       return t.numericLiteral(literal);
+//     case "string":
+//       return t.stringLiteral(literal);
+//     case "boolean":
+//       return t.booleanLiteral(literal);
+//     case "undefined":
+//       return t.unaryExpression("void", t.numericLiteral(0), true);
+//     default:
+//       if (Array.isArray(literal)) {
+//         return t.arrayExpression(literal.map(astify));
+//       }
+//       return t.objectExpression(
+//         Object.keys(literal)
+//           .filter((k) => {
+//             return typeof literal[k] !== "undefined";
+//           })
+//           .map((k) => {
+//             return t.objectProperty(t.stringLiteral(k), astify(literal[k]));
+//           })
+//       );
+//   }
+// }
+// function pbcopy(data) {
+//   var proc = require("child_process").spawn("pbcopy");
+//   proc.stdin.write(data);
+//   proc.stdin.end();
+// }
 function isEmptyObj(obj) {
   return Object.keys(obj).length === 0 && obj.constructor === Object;
 }
@@ -73,101 +77,121 @@ function uniqueId(prefix = "$lodash$") {
 const idCounter = {};
 let componentsList = {};
 let componentsMap = {};
-
+const updateFile = (platform, data) => {
+  bundle.generateBuildTimeMap(platform, data);
+  let updatedResolvedStyledMap = {};
+  providerIds.forEach((providerId) => {
+    updatedResolvedStyledMap[providerId] =
+      bundle.resolvedStyledMap?.generatedBuildTimeMap;
+  });
+  const modifiedData = `
+    export default ${JSON.stringify(updatedResolvedStyledMap, null, 2)}
+  `;
+  // console.log("modifiedData");
+  fs.writeFileSync(
+    process.cwd() +
+      "/node_modules/native-base/lib/module/utils/map/index." +
+      platform +
+      ".js",
+    modifiedData
+  );
+};
 module.exports = function ({ types: t }) {
   return {
     visitor: {
       Program(path) {
         const filePath = this.file.opts.filename;
-        if (
-          filePath.includes("/node_modules/native-base/lib/module/index.js")
-        ) {
-          path.traverse({
-            ImportDeclaration(importPath) {
-              importPath.insertBefore([
-                t.importDeclaration(
-                  [
-                    t.importSpecifier(
-                      t.identifier("init"),
-                      t.identifier("init")
-                    ),
-                  ],
-                  t.stringLiteral("./utils/styled")
-                ),
-                t.expressionStatement(
-                  t.callExpression(t.identifier("init"), [
-                    astify(bundle.resolvedStyledMap),
-                  ])
-                ),
-              ]);
-              importPath.stop();
-            },
-          });
-        } else {
-          path.traverse({
-            ImportDeclaration(importPath) {
-              if (importPath.node.source.value === "native-base") {
-                if (importPath.node.specifiers) {
-                  importPath.node.specifiers.map((specifier) => {
-                    if (specifier.imported) {
-                      componentsList[specifier.imported.name] = true;
-                    } else {
-                      componentsList["allImport"] = true;
-                    }
-                  });
-                }
-              }
-            },
-          });
-          path.traverse({
-            JSXOpeningElement(jsxOpeningElementPath) {
-              if (
-                Object.keys(componentsList).includes(
-                  jsxOpeningElementPath.node.name.name
-                )
-              ) {
-                if (
-                  jsxOpeningElementPath.node.name.name === "NativeBaseProvider"
-                ) {
-                  if (jsxOpeningElementPath.node.attributes) {
-                    jsxOpeningElementPath.node.attributes.push(
-                      createJSXAttributeNode(
-                        "providerId",
-                        uniqueId("nbBootTime-")
-                      )
-                    );
+        // if (
+        //   filePath.includes("/node_modules/native-base/lib/module/index.js")
+        // ) {
+        //   path.traverse({
+        //     ImportDeclaration(importPath) {
+        //       importPath.insertBefore([
+        //         t.importDeclaration(
+        //           [
+        //             t.importSpecifier(
+        //               t.identifier("init"),
+        //               t.identifier("init")
+        //             ),
+        //           ],
+        //           t.stringLiteral("./utils/styled")
+        //         ),
+        //         t.expressionStatement(
+        //           t.callExpression(t.identifier("init"), [
+        //             astify(bundle.resolvedStyledMap),
+        //           ])
+        //         ),
+        //       ]);
+        //       importPath.stop();
+        //     },
+        //   });
+        // } else {
+        path.traverse({
+          ImportDeclaration(importPath) {
+            if (importPath.node.source.value === "native-base") {
+              if (importPath.node.specifiers) {
+                importPath.node.specifiers.map((specifier) => {
+                  if (specifier.imported) {
+                    componentsList[specifier.imported.name] = true;
                   } else {
-                    jsxOpeningElementPath.node.attributes = [
-                      createJSXAttributeNode(
-                        "providerId",
-                        uniqueId("nbBootTime-")
-                      ),
-                    ];
+                    componentsList["allImport"] = true;
                   }
+                });
+              }
+            }
+          },
+        });
+        path.traverse({
+          JSXOpeningElement(jsxOpeningElementPath) {
+            if (
+              Object.keys(componentsList).includes(
+                jsxOpeningElementPath.node.name.name
+              )
+            ) {
+              if (
+                jsxOpeningElementPath.node.name.name === "NativeBaseProvider"
+              ) {
+                if (jsxOpeningElementPath.node.attributes) {
+                  jsxOpeningElementPath.node.attributes.push(
+                    createJSXAttributeNode(
+                      "providerId",
+                      uniqueId("nbBootTime-")
+                    )
+                  );
                 } else {
-                  const attrs = jsxOpeningElementPath.node.attributes;
-                  const componentAttrs = {};
-                  attrs.map((attr) => {
-                    if (
-                      ["colorScheme", "variant", "size"].includes(
-                        attr.name.name
-                      )
-                    ) {
-                      componentAttrs[attr.name.name] = attr.value.value;
-                    }
-                  });
-                  if (!isEmptyObj(componentAttrs)) {
-                    updateComponentMap(
-                      jsxOpeningElementPath.node.name.name,
-                      componentAttrs
-                    );
+                  jsxOpeningElementPath.node.attributes = [
+                    createJSXAttributeNode(
+                      "providerId",
+                      uniqueId("nbBootTime-")
+                    ),
+                  ];
+                }
+              } else {
+                const attrs = jsxOpeningElementPath.node.attributes;
+                const componentAttrs = {};
+                attrs.map((attr) => {
+                  if (
+                    ["colorScheme", "variant", "size"].includes(attr.name.name)
+                  ) {
+                    componentAttrs[attr.name.name] = attr.value.value;
                   }
+                });
+                if (!isEmptyObj(componentAttrs)) {
+                  updateComponentMap(
+                    jsxOpeningElementPath.node.name.name,
+                    componentAttrs
+                  );
                 }
               }
-            },
-          });
+            }
+          },
+        });
+        if (!filePath.includes("/node_modules/")) {
+          console.log(componentsMap, "Componnet Map");
+          updateFile("web", componentsMap);
+          updateFile("ios", componentsMap);
+          updateFile("android", componentsMap);
         }
-        bundle.generateBuildTimeMap("web", componentsMap);
       },
       // CallExpression(path) {
       //   if (
