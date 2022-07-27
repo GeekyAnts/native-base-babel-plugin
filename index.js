@@ -5,7 +5,7 @@ const fs = require("fs");
 
 // Utility functions
 function createJSXAttributeNode(name, value) {
-  let providerIds = [];
+  let providerIds = {};
   if (
     fs.existsSync(
       process.cwd() +
@@ -18,13 +18,13 @@ function createJSXAttributeNode(name, value) {
           "/node_modules/native-base/lib/module/utils/map/providerIds.json"
       )
       .toString("utf8");
-    providerIds = JSON.parse(data)?.providers;
+    providerIds = JSON.parse(data);
   }
-  providerIds.push(value);
+  providerIds[value] = true;
   fs.writeFileSync(
     process.cwd() +
       "/node_modules/native-base/lib/module/utils/map/providerIds.json",
-    JSON.stringify({ providers: providerIds })
+    JSON.stringify(providerIds)
   );
   return t.jsxAttribute(t.jsxIdentifier(name), t.stringLiteral(value));
 }
@@ -97,7 +97,7 @@ let componentsMap = {};
 const updateFile = (platform, data) => {
   bundle.generateBuildTimeMap(platform, data);
   let updatedResolvedStyledMap = {};
-  let providerIds = [];
+  let providerIds = {};
   if (
     fs.existsSync(
       process.cwd() +
@@ -110,9 +110,9 @@ const updateFile = (platform, data) => {
           "/node_modules/native-base/lib/module/utils/map/providerIds.json"
       )
       .toString("utf8");
-    providerIds = JSON.parse(data)?.providers;
+    providerIds = JSON.parse(data);
   }
-  providerIds.forEach((providerId) => {
+  Object.keys(providerIds).forEach((providerId) => {
     updatedResolvedStyledMap[providerId] =
       bundle.resolvedStyledMap?.generatedBuildTimeMap;
   });
