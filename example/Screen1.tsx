@@ -7,7 +7,7 @@ export default function Screen1() {
   const clsch = "red";
   return (
     <Box>
-      <Button colorScheme={clsch} onPress={() => setScreen2(!screen2)}>
+      <Button colorScheme={"red"} onPress={() => setScreen2(!screen2)}>
         Mount/Unmount Screen2
       </Button>
       {screen2 && <Screen2 />}
