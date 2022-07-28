@@ -27,6 +27,16 @@ module.exports = function (api) {
 };
 
 ```
+Also in dev env you will have to delete the cache generated on your root in the folder .native-base .
+You can simply add `rm -rf .native-base` in your dev script.
+
+```json
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "other-scripts":"yarn something",
+    "dev": "rm -rf .native-base && yarn start",
+  }
+```
 
 ## To setup the Development environment - 
 - clone this Repo
