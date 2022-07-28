@@ -2,30 +2,31 @@ const t = require("@babel/types");
 const p = require("@babel/parser");
 const bundle = require(process.cwd() + "/node_modules/native-base/src/bundle");
 const fs = require("fs");
+const path = require("path");
 
 // Utility functions
 function createJSXAttributeNode(name, value) {
   let providerIds = {};
-  if (
-    fs.existsSync(
-      process.cwd() +
-        "/node_modules/native-base/lib/module/utils/map/providerIds.json"
-    )
-  ) {
+  if (fs.existsSync(process.cwd() + "/.native-base/providerIds.json")) {
     const data = fs
-      .readFileSync(
-        process.cwd() +
-          "/node_modules/native-base/lib/module/utils/map/providerIds.json"
-      )
+      .readFileSync(process.cwd() + "/.native-base/providerIds.json")
       .toString("utf8");
     providerIds = JSON.parse(data);
   }
   providerIds[value] = true;
-  fs.writeFileSync(
-    process.cwd() +
-      "/node_modules/native-base/lib/module/utils/map/providerIds.json",
-    JSON.stringify(providerIds)
-  );
+  var dirname = path.dirname(process.cwd() + "/.native-base/providerIds.json");
+  if (fs.existsSync(dirname)) {
+    fs.writeFileSync(
+      process.cwd() + "/.native-base/providerIds.json",
+      JSON.stringify(providerIds)
+    );
+  } else {
+    fs.mkdirSync(dirname);
+    fs.writeFileSync(
+      process.cwd() + "/.native-base/providerIds.json",
+      JSON.stringify(providerIds)
+    );
+  }
   return t.jsxAttribute(t.jsxIdentifier(name), t.stringLiteral(value));
 }
 // function astify(literal) {
@@ -78,12 +79,19 @@ function updateComponentMap(component, propArray) {
   }
 }
 
-function uniqueId(prefix = "$lodash$") {
-  if (!idCounter[prefix]) {
-    idCounter[prefix] = 0;
+function nextId(prefix = "$lodash$") {
+  let providerIds = {};
+  if (fs.existsSync(process.cwd() + "/.native-base/providerIds.json")) {
+    const data = fs
+      .readFileSync(process.cwd() + "/.native-base/providerIds.json")
+      .toString("utf8");
+    providerIds = JSON.parse(data);
   }
+  const idMap = Object.keys(providerIds);
+  const idMapMetaData =
+    idMap.length === 0 ? "0" : idMap[idMap?.length - 1]?.slice("-");
+  let id = parseInt(idMapMetaData[idMapMetaData?.length - 1]) + 1;
 
-  const id = ++idCounter[prefix];
   if (prefix === "$lodash$") {
     return `${id}`;
   }
@@ -98,17 +106,9 @@ const updateFile = (platform, data) => {
   bundle.generateBuildTimeMap(platform, data);
   let updatedResolvedStyledMap = {};
   let providerIds = {};
-  if (
-    fs.existsSync(
-      process.cwd() +
-        "/node_modules/native-base/lib/module/utils/map/providerIds.json"
-    )
-  ) {
+  if (fs.existsSync(process.cwd() + "/.native-base/providerIds.json")) {
     const data = fs
-      .readFileSync(
-        process.cwd() +
-          "/node_modules/native-base/lib/module/utils/map/providerIds.json"
-      )
+      .readFileSync(process.cwd() + "/.native-base/providerIds.json")
       .toString("utf8");
     providerIds = JSON.parse(data);
   }
@@ -189,14 +189,14 @@ module.exports = function ({ types: t }) {
                     jsxOpeningElementPath.node.attributes.push(
                       createJSXAttributeNode(
                         "providerId",
-                        uniqueId("nbBootTime-")
+                        nextId("nbBootTime-")
                       )
                     );
                   } else {
                     jsxOpeningElementPath.node.attributes = [
                       createJSXAttributeNode(
                         "providerId",
-                        uniqueId("nbBootTime-")
+                        nextId("nbBootTime-")
                       ),
                     ];
                   }

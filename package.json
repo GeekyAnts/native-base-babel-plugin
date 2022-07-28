@@ -5,10 +5,10 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cd example && rm -rf .expo && yarn start",
-    "dev:web": "cd example && rm -rf .expo && yarn web",
-    "dev:android": "cd example && rm -rf .expo && yarn android",
-    "dev:ios": "cd example && rm -rf .expo && yarn ios",
+    "dev": "cd example && rm -rf .expo .native-base && yarn start",
+    "dev:web": "cd example && rm -rf .expo .native-base && yarn web",
+    "dev:android": "cd example && rm -rf .expo .native-base && yarn android",
+    "dev:ios": "cd example && rm -rf .expo .native-base && yarn ios",
     "build": "babel index.js -d lib",
     "publish": "yarn build && yarn version && npm publish"
   },
