@@ -1,6 +1,6 @@
 {
   "name": "@native-base/babel-plugin",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A babel plugin to add Build time theme resolution for Nativebase",
   "main": "lib/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "dev:android": "cd example && rm -rf .expo .native-base && yarn android",
     "dev:ios": "cd example && rm -rf .expo .native-base && yarn ios",
     "build": "babel index.js -d lib",
-    "publish": "yarn build && yarn version && npm publish"
+    "prepare": "yarn build && yarn version"
   },
   "author": "Rohit Singh",
   "license": "ISC",
