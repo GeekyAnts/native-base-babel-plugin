@@ -205,6 +205,7 @@ module.exports = function ({ types: t }) {
                   const componentAttrs = {};
                   attrs.map((attr) => {
                     if (
+                      attr.type !== "JSXSpreadAttribute" &&
                       ["colorScheme", "variant", "size"].includes(
                         attr.name.name
                       )
