@@ -129,37 +129,30 @@ const updateFile = (platform, data) => {
     modifiedData
   );
 };
+
+const doesItemsOfArrayContainsString = (arr, str) => {
+  let flag = false;
+  arr.forEach((item) => {
+    if (str.includes(item)) {
+      flag = true;
+    }
+  });
+  return flag;
+};
+
 module.exports = function ({ types: t }) {
   return {
     visitor: {
       Program(path) {
         const filePath = this.file.opts.filename;
-        // if (
-        //   filePath.includes("/node_modules/native-base/lib/module/index.js")
-        // ) {
-        //   path.traverse({
-        //     ImportDeclaration(importPath) {
-        //       importPath.insertBefore([
-        //         t.importDeclaration(
-        //           [
-        //             t.importSpecifier(
-        //               t.identifier("init"),
-        //               t.identifier("init")
-        //             ),
-        //           ],
-        //           t.stringLiteral("./utils/styled")
-        //         ),
-        //         t.expressionStatement(
-        //           t.callExpression(t.identifier("init"), [
-        //             astify(bundle.resolvedStyledMap),
-        //           ])
-        //         ),
-        //       ]);
-        //       importPath.stop();
-        //     },
-        //   });
-        // } else {
-        if (!filePath.includes("/node_modules/")) {
+        if (
+          !doesItemsOfArrayContainsString(
+            ["/node_modules/", "/build/", "/.next/"],
+            filePath
+          )
+        ) {
+          // if (!filePath.includes("/node_modules/")) {
+          console.log("Path =>>  ", filePath);
           path.traverse({
             ImportDeclaration(importPath) {
               if (importPath.node.source.value === "native-base") {
@@ -178,6 +171,7 @@ module.exports = function ({ types: t }) {
           path.traverse({
             JSXOpeningElement(jsxOpeningElementPath) {
               if (
+                !isEmptyObj(componentsList) &&
                 Object.keys(componentsList).includes(
                   jsxOpeningElementPath.node.name.name
                 )
@@ -228,19 +222,6 @@ module.exports = function ({ types: t }) {
           updateFile("android", componentsMap);
         }
       },
-      // CallExpression(path) {
-      //   if (
-      //     path.node.callee.name === 'init'
-      //     //  &&
-      //     // t.isIdentifier(path.parent.id, {
-      //     //   name: 'resolvedStyledMap',
-      //     // })
-      //   ) {
-      //     // path.replaceWith(astify(testObj));
-      //     console.log(JSON.stringify(path.node.left, null, 2));
-      //     pbcopy(JSON.stringify(path.parent, null, 2));
-      //   }
-      // },
     },
   };
 };
