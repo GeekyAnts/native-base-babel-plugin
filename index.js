@@ -152,7 +152,7 @@ module.exports = function ({ types: t }) {
           )
         ) {
           // if (!filePath.includes("/node_modules/")) {
-          console.log("Path =>>  ", filePath);
+          // console.log("Path =>>  ", filePath);
           path.traverse({
             ImportDeclaration(importPath) {
               if (importPath.node.source.value === "native-base") {
