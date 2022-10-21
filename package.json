@@ -22,8 +22,9 @@
     "native-base": "*"
   },
   "devDependencies": {
+    "@babel/generator": "^7.19.6",
     "@babel/preset-env": "^7.18.9",
-    "native-base": "3.5.0-alpha.5"
+    "native-base": "3.5.0-rc.5"
   },
   "engines": {
     "node": ">=10.24.1"

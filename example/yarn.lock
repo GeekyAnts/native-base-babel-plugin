@@ -1865,10 +1865,10 @@
     "@react-native-aria/utils" "^0.2.6"
     "@react-types/button" "^3.3.1"
 
-"@react-native-aria/focus@^0.2.6":
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/@react-native-aria/focus/-/focus-0.2.6.tgz#b824944b2d7020f74a80fd849f2bf77aac9d3d29"
-  integrity sha512-J/WKi5qizCFwv3XCDTSUePYz7zfpGpwU4XsDQZ48j2DlC29sX7JbRoml9/lu8/hhEEOz6/mpkaaFTgv0uFZcVA==
+"@react-native-aria/focus@0.2.7":
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/@react-native-aria/focus/-/focus-0.2.7.tgz#fd339d5ec8384cee6afe0c0115a528f360d04a27"
+  integrity sha512-7Ol8AoTzEN7qC4t4AzclPzjQZ0oRkNBePmVBm2lAQwOnmkKwa+TdiVGtU7MgvsQxUV3aTTMY2Nu1Z5YwCwhUkA==
   dependencies:
     "@react-aria/focus" "^3.2.3"
 
@@ -5886,10 +5886,10 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-native-base@^3.5.0-alpha.17:
-  version "3.5.0-alpha.17"
-  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.5.0-alpha.17.tgz#51662721d3b84511a6aba60a2a40eaaa977f5aae"
-  integrity sha512-RlXvwStDojaMYssFKw9y0KUcTbKvgy+/bN0XeifMGIM29MeLZJuFa03AvT4EZphx6zsgaSbs/BJiffXkmdsb2A==
+native-base@3.5.0-rc.6:
+  version "3.5.0-rc.6"
+  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.5.0-rc.6.tgz#ab3d36c5426fd4478b90fb9b46f14e3d17a078af"
+  integrity sha512-sBaxFAzIRwvIlrx8OKth10enlM9u4L3YYyVxJRWPxctzsK+egciUtDhj3WgQbrZ78dXPJVisk8LKjWtX03F6IA==
   dependencies:
     "@react-aria/focus" "3.2.3"
     "@react-aria/utils" "^3.6.0"
@@ -5897,7 +5897,7 @@ native-base@^3.5.0-alpha.17:
     "@react-native-aria/button" "^0.2.4"
     "@react-native-aria/checkbox" "^0.2.2"
     "@react-native-aria/combobox" "^0.2.4-alpha.0"
-    "@react-native-aria/focus" "^0.2.6"
+    "@react-native-aria/focus" "0.2.7"
     "@react-native-aria/interactions" "^0.2.2"
     "@react-native-aria/listbox" "^0.2.4-alpha.3"
     "@react-native-aria/overlays" "0.3.3-rc.0"

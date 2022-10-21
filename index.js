@@ -1,10 +1,25 @@
 const t = require("@babel/types");
 const p = require("@babel/parser");
+// const { default: generate } = require("@babel/generator");
 const bundle = require(process.cwd() + "/node_modules/native-base/src/bundle");
 const fs = require("fs");
 const path = require("path");
-
 // Utility functions
+// function astNodeToString(node) {
+//   return generate(node).code;
+// }
+
+function deleteIndexsofArray(arr, indexs) {
+  let newArr = arr;
+  for (var i = indexs.length - 1; i >= 0; i--) {
+    newArr.splice(indexs[i], 1);
+  }
+  return newArr;
+}
+
+function createObjectJSXAttribute(key, value) {
+  return t.jSXAttribute(t.jSXIdentifier(key), t.jSXExpressionContainer(value));
+}
 function createJSXAttributeNode(name, value) {
   let providerIds = {};
   if (fs.existsSync(process.cwd() + "/.native-base/providerIds.json")) {
@@ -29,39 +44,39 @@ function createJSXAttributeNode(name, value) {
   }
   return t.jsxAttribute(t.jsxIdentifier(name), t.stringLiteral(value));
 }
-// function astify(literal) {
-//   if (literal === null) {
-//   }
-//   switch (typeof literal) {
-//     case "function":
-//       const ast = babylon.parse(literal.toString(), {
-//         allowReturnOutsideFunction: true,
-//         allowSuperOutsideMethod: true,
-//       });
-//       return traverse.removeProperties(ast);
-//     case "number":
-//       return t.numericLiteral(literal);
-//     case "string":
-//       return t.stringLiteral(literal);
-//     case "boolean":
-//       return t.booleanLiteral(literal);
-//     case "undefined":
-//       return t.unaryExpression("void", t.numericLiteral(0), true);
-//     default:
-//       if (Array.isArray(literal)) {
-//         return t.arrayExpression(literal.map(astify));
-//       }
-//       return t.objectExpression(
-//         Object.keys(literal)
-//           .filter((k) => {
-//             return typeof literal[k] !== "undefined";
-//           })
-//           .map((k) => {
-//             return t.objectProperty(t.stringLiteral(k), astify(literal[k]));
-//           })
-//       );
-//   }
-// }
+function astify(literal) {
+  if (literal === null) {
+  }
+  switch (typeof literal) {
+    case "function":
+      const ast = babylon.parse(literal.toString(), {
+        allowReturnOutsideFunction: true,
+        allowSuperOutsideMethod: true,
+      });
+      return traverse.removeProperties(ast);
+    case "number":
+      return t.numericLiteral(literal);
+    case "string":
+      return t.stringLiteral(literal);
+    case "boolean":
+      return t.booleanLiteral(literal);
+    case "undefined":
+      return t.unaryExpression("void", t.numericLiteral(0), true);
+    default:
+      if (Array.isArray(literal)) {
+        return t.arrayExpression(literal.map(astify));
+      }
+      return t.objectExpression(
+        Object.keys(literal)
+          .filter((k) => {
+            return typeof literal[k] !== "undefined";
+          })
+          .map((k) => {
+            return t.objectProperty(t.stringLiteral(k), astify(literal[k]));
+          })
+      );
+  }
+}
 // function pbcopy(data) {
 //   var proc = require("child_process").spawn("pbcopy");
 //   proc.stdin.write(data);
@@ -99,7 +114,6 @@ function nextId(prefix = "$lodash$") {
   return `${prefix}${id}`;
 }
 
-const idCounter = {};
 let componentsList = {};
 let componentsMap = {};
 const updateFile = (platform, data) => {
@@ -151,8 +165,6 @@ module.exports = function ({ types: t }) {
             filePath
           )
         ) {
-          // if (!filePath.includes("/node_modules/")) {
-          // console.log("Path =>>  ", filePath);
           path.traverse({
             ImportDeclaration(importPath) {
               if (importPath.node.source.value === "native-base") {
@@ -195,9 +207,11 @@ module.exports = function ({ types: t }) {
                     ];
                   }
                 } else {
-                  const attrs = jsxOpeningElementPath.node.attributes;
+                  let attrs = jsxOpeningElementPath.node.attributes;
                   const componentAttrs = {};
-                  attrs.map((attr) => {
+                  const internalInlineStyleAttrs = {};
+                  let indexToBeRemoved = [];
+                  attrs.map((attr, ind) => {
                     if (
                       attr.type !== "JSXSpreadAttribute" &&
                       ["colorScheme", "variant", "size"].includes(
@@ -206,7 +220,43 @@ module.exports = function ({ types: t }) {
                     ) {
                       componentAttrs[attr.name.name] = attr.value.value;
                     }
+                    if (
+                      attr.type !== "JSXSpreadAttribute" &&
+                      !["colorScheme", "variant", "size"].includes(
+                        attr.name.name
+                      ) &&
+                      attr.value.type === "StringLiteral"
+                    ) {
+                      internalInlineStyleAttrs[attr.name.name] =
+                        attr.value.value;
+                      indexToBeRemoved.push(ind);
+                    }
+                    if (
+                      attr.type !== "JSXSpreadAttribute" &&
+                      !["colorScheme", "variant", "size"].includes(
+                        attr.name.name
+                      ) &&
+                      attr.value.type === "JSXExpressionContainer" &&
+                      attr.value.expression.type === "NumericLiteral"
+                    ) {
+                      internalInlineStyleAttrs[attr.name.name] =
+                        attr.value.expression.value;
+                      indexToBeRemoved.push(ind);
+                    }
                   });
+                  attrs = deleteIndexsofArray(attrs, indexToBeRemoved);
+                  if (!isEmptyObj(internalInlineStyleAttrs)) {
+                    const updatedInlineStyle = bundle.convertStyledProps({
+                      theme: bundle.defaultTheme,
+                      styledSystemProps: internalInlineStyleAttrs,
+                    }).styleFromProps;
+                    jsxOpeningElementPath.node.attributes.push(
+                      createObjectJSXAttribute(
+                        "INTERNAL_inlineStyle",
+                        astify(updatedInlineStyle)
+                      )
+                    );
+                  }
                   if (!isEmptyObj(componentAttrs)) {
                     updateComponentMap(
                       jsxOpeningElementPath.node.name.name,
